@@ -185,8 +185,8 @@ class PlayerApp {
       } else if (isCorrect) {
         // 正解！
         this.elements.stampBox.className = "stamp-box stamp-correct";
-        this.elements.stampTitle.textContent = "大 正 解 ！";
-        this.elements.stampSub.textContent = `あなたの解答: 【 ${this.confirmedChoice === "O" ? "〇" : "✕"} 】（正解！）`;
+        this.elements.stampTitle.textContent = "正 解 ！";
+        this.elements.stampSub.textContent = `あなたの解答: 【 ${this.confirmedChoice === "O" ? "〇" : "✕"} 】`;
       } else {
         // 不正解
         this.elements.stampBox.className = "stamp-box stamp-wrong";
