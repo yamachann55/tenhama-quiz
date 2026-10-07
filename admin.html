@@ -145,6 +145,11 @@
         <button id="btnReset" class="action-btn action-btn-danger" style="margin-top: 4px; padding: 10px; font-size: 13px;" onclick="adminApp.askAction('RESET')">
           全問リセット（最初に戻す）
         </button>
+
+        <!-- スプレッドシートから最新問題を再読込 -->
+        <button id="btnReloadQuestions" class="action-btn action-btn-secondary" style="margin-top: 4px; padding: 10px; font-size: 13px; border-color: var(--accent-gold); color: var(--accent-gold);" onclick="adminApp.reloadQuestions()">
+          🔄 スプシから問題を再読込（キャッシュ更新）
+        </button>
       </div>
 
       <!-- テスト用：ダミー回答者シミュレーションツール -->

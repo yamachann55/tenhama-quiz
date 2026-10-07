@@ -75,8 +75,9 @@ class QuizSyncEngine {
 
   /* -------------------------------------------------------------
    * 状態取得 (管理者 & 回答者 共通)
+   * forceRefresh: true の場合はGASのキャッシュを強制クリアして最新スプシを読込
    * ------------------------------------------------------------- */
-  async getState() {
+  async getState(forceRefresh = false) {
     if (this.isLocal) {
       const raw = localStorage.getItem(this.STORAGE_KEY_STATE);
       if (raw) {
@@ -98,7 +99,8 @@ class QuizSyncEngine {
     } else {
       // GAS から取得
       try {
-        const res = await fetch(`${CONFIG.GAS_API_URL}?action=getState&t=${Date.now()}`, {
+        const refreshParam = forceRefresh ? "&refresh=1" : "";
+        const res = await fetch(`${CONFIG.GAS_API_URL}?action=getState${refreshParam}&t=${Date.now()}`, {
           method: "GET",
           redirect: "follow"
         });

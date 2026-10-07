@@ -52,7 +52,28 @@ function setupSheets() {
 }
 
 /**
- * GET リクエスト処理 (状態取得 / 回答取得 / ヘルスチェック)
+ * スプレッドシート編集時トリガー
+ * 問題や設定をスプレッドシート上で編集した瞬間に自動でキャッシュを最新化します！
+ */
+function onEdit(e) {
+  try {
+    refreshStateCache();
+  } catch (err) {
+    console.error("onEdit error:", err);
+  }
+}
+
+/**
+ * 手動キャッシュクリア用関数（エディタの関数選択から1クリックで実行可能）
+ */
+function refreshCache() {
+  const state = refreshStateCache();
+  console.log("最新の問題データを再読み込みしました:", state.questions.length + "問");
+  return state;
+}
+
+/**
+ * GET リクエスト処理 (状態取得 / 回答取得 / ヘルスチェック / キャッシュ更新)
  */
 function doGet(e) {
   try {
@@ -62,7 +83,10 @@ function doGet(e) {
     let result = {};
 
     if (action === "getState") {
-      result = getCachedState();
+      const forceRefresh = params.refresh === "true" || params.refresh === "1";
+      result = forceRefresh ? refreshStateCache() : getCachedState();
+    } else if (action === "refresh") {
+      result = refreshStateCache();
     } else if (action === "getAnswers") {
       const qIdx = parseInt(params.q || "0", 10);
       result = getCachedAnswers(qIdx);

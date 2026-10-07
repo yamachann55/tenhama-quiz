@@ -44,6 +44,7 @@ class AdminApp {
       btnPrevQ: document.getElementById("btnPrevQ"),
       btnNextQ: document.getElementById("btnNextQ"),
       btnReset: document.getElementById("btnReset"),
+      btnReloadQuestions: document.getElementById("btnReloadQuestions"),
       confirmModal: document.getElementById("confirmModal"),
       modalTitle: document.getElementById("modalTitle"),
       modalDesc: document.getElementById("modalDesc"),
@@ -288,6 +289,31 @@ class AdminApp {
     if (!this.currentState) return;
     await syncEngine.resetAllAnswers();
     await this.fetchLatestState();
+  }
+
+  /* -------------------------------------------------------------
+   * スプレッドシートから問題を強制再読み込み（キャッシュクリア）
+   * ------------------------------------------------------------- */
+  async reloadQuestions() {
+    if (this.elements.btnReloadQuestions) {
+      this.elements.btnReloadQuestions.textContent = "スプシから再読込中...";
+      this.elements.btnReloadQuestions.disabled = true;
+    }
+
+    const state = await syncEngine.getState(true); // forceRefresh = true
+    if (state && state.questions && state.questions.length > 0) {
+      this.currentState = state;
+      const answers = await syncEngine.getAnswers(state.questionIndex);
+      this.render(answers);
+      alert(`✅ スプレッドシートから全 ${state.questions.length} 問を最新データで読み込みました！`);
+    } else {
+      alert("⚠️ 再読み込みに失敗しました。GASのURL設定と権限を確認してください。");
+    }
+
+    if (this.elements.btnReloadQuestions) {
+      this.elements.btnReloadQuestions.textContent = "🔄 スプシから問題を再読込（キャッシュ更新）";
+      this.elements.btnReloadQuestions.disabled = false;
+    }
   }
 }
 
