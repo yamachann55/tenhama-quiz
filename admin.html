@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>管理者画面 - 天浜線 文化財めぐり号 クイズ</title>
+  <link rel="stylesheet" href="css/retro-theme.css">
+  <style>
+    /* 管理者専用スタイル調整 */
+    .admin-badge {
+      background-color: var(--batsu-blue);
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.5px;
+    }
+    .status-tag-active {
+      background-color: #fce8e6;
+      color: var(--maru-red);
+      border: 1px solid var(--maru-red);
+    }
+    .status-tag-answer {
+      background-color: #d1e7dd;
+      color: #0f5132;
+      border: 1px solid #a3cfbb;
+    }
+    .correct-indicator {
+      display: inline-block;
+      font-weight: 900;
+      color: var(--maru-red);
+      background-color: rgba(201, 59, 43, 0.12);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 6px;
+      font-size: 14px;
+    }
+    /* デモ用テストツール枠 */
+    .dev-tools-box {
+      margin-top: 14px;
+      padding: 8px 10px;
+      background-color: #f0ede6;
+      border: 1px dashed #b8ad96;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .dev-tools-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .dev-btn {
+      flex: 1;
+      padding: 6px 4px;
+      background-color: #fff;
+      border: 1px solid #a89f8c;
+      border-radius: 3px;
+      font-size: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-wrapper">
+    <!-- ヘッダー -->
+    <header class="retro-header">
+      <div class="ticket-number">第〇×号券【車掌・運行管理用】</div>
+      <div class="title-banner">
+        <span>天浜線 運行司令室</span>
+        <span class="admin-badge">管理者盤</span>
+      </div>
+    </header>
+
+    <!-- メインボディ -->
+    <main class="retro-body">
+      <!-- 進行状況ステータス -->
+      <div class="status-bar">
+        <span id="adminStepLabel">第 1 問 / 全 5 問</span>
+        <span id="adminPhaseTag" class="answer-status-pill status-tag-active">出題・回答受付中</span>
+      </div>
+
+      <!-- 現在の問題ボード -->
+      <div class="question-board">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <span id="adminQNumber" class="question-number">第 1 問</span>
+          <span id="adminCorrectBadge" class="correct-indicator">正解: 【 〇 】</span>
+        </div>
+        <div id="adminQText" class="question-text">問題を読み込み中...</div>
+        <!-- 管理者用 解説・画像ミニプレビュー（司会実況用） -->
+        <div id="adminExplanationArea" style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-main); font-size: 12px; color: var(--text-sub);">
+          <div style="font-weight: bold; color: var(--accent-gold); margin-bottom: 2px;">【解説・豆知識】</div>
+          <div id="adminExplanationText" style="line-height: 1.5; margin-bottom: 6px;"></div>
+          <div id="adminImageBox" class="explanation-image-box" style="display: none; margin: 6px 0;">
+            <img id="adminImg" class="explanation-img" src="" alt="解説写真プレビュー">
+          </div>
+        </div>
+      </div>
+
+      <!-- リアルタイム集計ダッシュボード -->
+      <div class="admin-grid">
+        <div class="stat-card">
+          <div class="stat-label">回答者総数</div>
+          <div id="statTotalCount" class="stat-value">0</div>
+          <div id="statMaxPercent" class="stat-sub">最大 45 名想定</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">正答率</div>
+          <div id="statAccuracy" class="stat-value">-- %</div>
+          <div id="statCorrectWrong" class="stat-sub">正解: - / 不正解: -</div>
+        </div>
+      </div>
+
+      <!-- 〇×回答内訳バーグラフ -->
+      <div class="rate-bar-container">
+        <div class="rate-bar-label">
+          <span style="color: var(--maru-red);">〇 の回答: <strong id="countMaru">0</strong> 名</span>
+          <span style="color: var(--batsu-blue);">✕ の回答: <strong id="countBatsu">0</strong> 名</span>
+        </div>
+        <div class="rate-progress">
+          <div id="barMaru" class="rate-fill-maru" style="width: 50%;">〇 50%</div>
+          <div id="barBatsu" class="rate-fill-batsu" style="width: 50%;">✕ 50%</div>
+        </div>
+      </div>
+
+      <!-- 操作ボタン群（誤タップ防止機能付き） -->
+      <div class="admin-actions">
+        <!-- 正誤発表ボタン -->
+        <button id="btnToggleAnswer" class="action-btn action-btn-primary" onclick="adminApp.askAction('TOGGLE_ANSWER')">
+          正 誤 発 表 を 行 う
+        </button>
+
+        <!-- 前へ / 次へ ボタングリッド -->
+        <div class="nav-row">
+          <button id="btnPrevQ" class="action-btn action-btn-secondary" onclick="adminApp.askAction('PREV_Q')">
+            ◀ 前の問題
+          </button>
+          <button id="btnNextQ" class="action-btn action-btn-secondary" onclick="adminApp.askAction('NEXT_Q')">
+            次の問題 ▶
+          </button>
+        </div>
+
+        <!-- リセットボタン -->
+        <button id="btnReset" class="action-btn action-btn-danger" style="margin-top: 4px; padding: 10px; font-size: 13px;" onclick="adminApp.askAction('RESET')">
+          全問リセット（最初に戻す）
+        </button>
+      </div>
+
+      <!-- テスト用：ダミー回答者シミュレーションツール -->
+      <div class="dev-tools-box">
+        <div style="font-weight: bold; color: var(--text-sub);">【テスト用】回答者シミュレーター</div>
+        <div class="dev-tools-row">
+          <button class="dev-btn" onclick="adminApp.simulateAnswers(10)">+10名 回答注入</button>
+          <button class="dev-btn" onclick="adminApp.simulateAnswers(45)">45名 満席注入</button>
+          <button class="dev-btn" onclick="adminApp.clearCurrentAnswers()">回答クリア</button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="retro-footer">
+      <div>運行管理コンソール</div>
+      <div id="adminModeIndicator">同期待機中</div>
+    </footer>
+  </div>
+
+  <!-- 誤タップ防止用 レトロ確認モーダル -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-card">
+      <div id="modalTitle" class="modal-title">操作の確認</div>
+      <div id="modalDesc" class="modal-desc">この操作を実行してよろしいですか？</div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="adminApp.closeModal()">戻る（中止）</button>
+        <button id="modalConfirmBtn" class="btn-confirm" onclick="adminApp.executeConfirmedAction()">実行する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- スクリプト読み込み -->
+  <script src="js/config.js"></script>
+  <script src="js/mockData.js"></script>
+  <script src="js/sync-engine.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

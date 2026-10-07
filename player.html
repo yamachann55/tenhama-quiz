@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>回答者画面 - 天浜線 文化財めぐり号 クイズ</title>
+  <link rel="stylesheet" href="css/retro-theme.css">
+  <style>
+    /* 回答者特有の微調整スタイル */
+    .user-info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed var(--border-main);
+    }
+    .user-name-tag {
+      font-weight: bold;
+      color: var(--accent-gold);
+    }
+    .answer-status-pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    .status-unanswered {
+      background-color: #eeddbb;
+      color: #695027;
+    }
+    .status-answered {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+    /* 名前入力モーダル */
+    .name-input-group {
+      margin: 16px 0;
+    }
+    .retro-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid var(--border-dark);
+      border-radius: 4px;
+      background-color: #fff;
+      color: var(--text-main);
+      box-sizing: border-box;
+      outline: none;
+      text-align: center;
+    }
+    .retro-input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 2px rgba(150, 111, 51, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-wrapper">
+    <!-- ヘッダー -->
+    <header class="retro-header">
+      <div class="ticket-number">第〇×号券【乗客用】</div>
+      <div class="title-banner">
+        <span>天浜線 文化財めぐり号</span>
+        <span class="sub-tag">〇×クイズ</span>
+      </div>
+    </header>
+
+    <!-- メインボディ -->
+    <main class="retro-body">
+      <!-- ユーザー情報 & 同期ステータス -->
+      <div class="user-info-bar">
+        <div>乗客名: <span id="displayUserName" class="user-name-tag">乗客</span></div>
+        <div id="connectionStatus" class="badge-live">同期中</div>
+      </div>
+
+      <!-- 現在の進行状況バッジ -->
+      <div class="status-bar">
+        <span id="questionStep">第 1 問 / 全 5 問</span>
+        <span id="quizPhase" class="answer-status-pill status-unanswered">回答受付中</span>
+      </div>
+
+      <!-- 出題ボード -->
+      <div class="question-board">
+        <div id="qNumberLabel" class="question-number">第 1 問</div>
+        <div id="qText" class="question-text">問題を読み込み中...</div>
+      </div>
+
+      <!-- 〇× 選択ボタングリッド -->
+      <div class="choice-grid" id="choiceContainer">
+        <div class="choice-btn maru" id="btnMaru" onclick="playerApp.selectChoice('O')">
+          <div class="symbol">〇</div>
+          <div class="label">正しい</div>
+        </div>
+        <div class="choice-btn batsu" id="btnBatsu" onclick="playerApp.selectChoice('X')">
+          <div class="symbol">✕</div>
+          <div class="label">誤り</div>
+        </div>
+      </div>
+
+      <!-- 誤タップ防止：決定・確認セクション -->
+      <div class="confirmation-box" id="confirmBox">
+        <div class="confirm-guide" id="confirmGuideText">どちらかを選択してください</div>
+        
+        <!-- 決定ボタン -->
+        <button id="btnConfirmAnswer" class="action-btn action-btn-primary" onclick="playerApp.confirmAnswer()" disabled>
+          解答を送信する
+        </button>
+
+        <!-- 決定後の選び直しボタン -->
+        <button id="btnChangeAnswer" class="action-btn action-btn-secondary" style="display: none;" onclick="playerApp.allowChangeAnswer()">
+          選択肢を選び直す
+        </button>
+      </div>
+
+      <!-- 正誤発表エリア（管理者発表時に表示） -->
+      <div id="resultArea" style="display: none;">
+        <div class="result-stamp-container">
+          <div id="stampBox" class="stamp-box stamp-correct">
+            <div id="stampTitle" class="stamp-title">正 解 ！</div>
+            <div id="stampSub" class="stamp-detail">あなたの解答: 【 〇 】</div>
+          </div>
+        </div>
+
+        <!-- 解説カード -->
+        <div class="explanation-card">
+          <div class="explanation-title">◆ 解説・文化財ミニ豆知識 ◆</div>
+          <!-- 相対幅90%で表示される解説画像 -->
+          <div class="explanation-image-box" id="explanationImageBox" style="display: none;">
+            <img id="explanationImg" class="explanation-img" src="" alt="解説写真">
+          </div>
+          <div id="explanationText" class="explanation-text"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="retro-footer">
+      <div>天竜浜名湖鉄道 / 文化財めぐり</div>
+      <div id="modeIndicator">ローカル連携中</div>
+    </footer>
+  </div>
+
+  <!-- 初回名前入力モーダル -->
+  <div class="modal-overlay" id="nameModal">
+    <div class="modal-card">
+      <div class="modal-title">乗車記念・ニックネーム登録</div>
+      <div class="modal-desc">
+        文化財めぐり号へようこそ！<br>
+        クイズに参加するお名前（ニックネーム）を入力してください。
+      </div>
+      <div class="name-input-group">
+        <input type="text" id="inputUserName" class="retro-input" placeholder="例: はまなこ太郎" maxlength="10">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-confirm" onclick="playerApp.saveUserName()">乗車する（参加）</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- スクリプト読み込み -->
+  <script src="js/config.js"></script>
+  <script src="js/mockData.js"></script>
+  <script src="js/sync-engine.js"></script>
+  <script src="js/player.js"></script>
+</body>
+</html>

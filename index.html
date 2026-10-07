@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天浜線 文化財めぐり号 〇×クイズ</title>
+  <link rel="stylesheet" href="css/retro-theme.css">
+  <style>
+    .portal-container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .station-sign {
+      background-color: #fff;
+      border: 3px solid var(--border-dark);
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+    }
+    .station-sub {
+      font-size: 11px;
+      color: var(--text-sub);
+      letter-spacing: 2px;
+    }
+    .station-main {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      margin: 6px 0;
+      color: var(--text-main);
+    }
+    .station-kana {
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: var(--accent-gold);
+    }
+    .portal-card {
+      background-color: var(--bg-card);
+      border: 2px solid var(--border-main);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-soft);
+    }
+    .portal-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-bottom: 12px;
+      transition: all 0.15s ease;
+      border: 2px solid;
+    }
+    .portal-btn:active {
+      transform: translateY(2px);
+    }
+    .btn-player {
+      background-color: #fff;
+      border-color: var(--maru-red);
+      color: var(--maru-red);
+    }
+    .btn-player:hover {
+      background-color: var(--maru-bg);
+    }
+    .btn-admin {
+      background-color: #fff;
+      border-color: var(--batsu-blue);
+      color: var(--batsu-blue);
+    }
+    .btn-admin:hover {
+      background-color: var(--batsu-bg);
+    }
+    .btn-icon {
+      font-size: 22px;
+    }
+    .btn-text-main {
+      font-size: 16px;
+      display: block;
+    }
+    .btn-text-sub {
+      font-size: 11px;
+      font-weight: normal;
+      color: var(--text-sub);
+      display: block;
+      margin-top: 2px;
+    }
+    .guide-box {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-main);
+      background-color: var(--bg-card-sub);
+      padding: 14px;
+      border-radius: 6px;
+      border: 1px dashed var(--border-dark);
+    }
+    .guide-title {
+      font-weight: bold;
+      color: var(--accent-gold);
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="portal-container">
+    <!-- 駅名標風バナー -->
+    <div class="station-sign">
+      <div class="station-sub">てんりゅうはまなこてつどう</div>
+      <div class="station-main">天竜二俣</div>
+      <div class="station-kana">TENRYŪ-FUTAMATA</div>
+    </div>
+
+    <!-- ポータル案内 -->
+    <div class="portal-card">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <span class="sub-tag" style="font-size: 12px; padding: 3px 8px;">特別列車イベント</span>
+        <h1 style="font-size: 20px; margin-top: 6px; font-weight: 800;">文化財めぐり号 〇×クイズ</h1>
+        <p style="font-size: 12px; color: var(--text-sub); margin-top: 4px;">スマホ専用・リアルタイム対戦システム</p>
+      </div>
+
+      <!-- リンクボタン -->
+      <a href="player.html" class="portal-btn btn-player" target="_blank">
+        <div>
+          <span class="btn-text-main">🎫 回答者画面（乗客用）を開く</span>
+          <span class="btn-text-sub">〇×を選択して解答を送信します（誤タップ防止つき）</span>
+        </div>
+        <span class="btn-icon">▶</span>
+      </a>
+
+      <a href="admin.html" class="portal-btn btn-admin" target="_blank">
+        <div>
+          <span class="btn-text-main">🕹️ 管理者画面（運行司令盤）を開く</span>
+          <span class="btn-text-sub">問題送り・正誤発表・リアルタイム45名集計グラフ</span>
+        </div>
+        <span class="btn-icon">▶</span>
+      </a>
+    </div>
+
+    <!-- テスト方法の案内 -->
+    <div class="guide-box">
+      <div class="guide-title">💡 動作テスト（タブ間リアルタイム連携）の手順</div>
+      <ol style="padding-left: 18px; margin: 0;">
+        <li>上のボタンから「<strong>回答者画面</strong>」と「<strong>管理者画面</strong>」を別タブ（または画面を左右に並べて）で開きます。</li>
+        <li>回答者画面で名前を入力し、〇または×を選んで「解答を送信」します。</li>
+        <li>管理者画面でリアルタイムに回答者数・〇×比率が更新されるのを確認できます。</li>
+        <li>管理者画面で「正誤発表」を押すと、回答者画面にスタンプと解説が自動表示されます！</li>
+        <li>管理者画面には「+10名」「45名満席」のダミー注入ボタンもあるので、最大45人の集計挙動もすぐに試せます。</li>
+      </ol>
+    </div>
+
+    <div style="text-align: center; margin-top: 14px; font-size: 11px; color: var(--text-sub);">
+      天竜浜名湖鉄道 登録有形文化財めぐり号 運行記念
+    </div>
+  </div>
+
+</body>
+</html>
