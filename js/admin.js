@@ -255,11 +255,20 @@ class AdminApp {
     } else if (action === "RESET") {
       newState.questionIndex = 0;
       newState.status = "QUESTION";
-      await syncEngine.resetAllAnswers();
     }
 
-    await syncEngine.updateState(newState);
-    await this.fetchLatestState();
+    // 🚀 楽観的UI更新: GASの応答を待たずに管理者の手元画面を0秒で即時切り替え！
+    this.currentState = newState;
+    const currentAnswers = await syncEngine.getAnswers(newState.questionIndex);
+    this.render(currentAnswers);
+
+    // バックグラウンドで非同期にGASへ送信
+    if (action === "RESET") {
+      await syncEngine.resetAllAnswers();
+    }
+    syncEngine.updateState(newState).catch((err) => {
+      console.error("updateState failed:", err);
+    });
   }
 
   /* -------------------------------------------------------------

@@ -113,12 +113,13 @@ class PlayerApp {
   }
 
   startPolling() {
-    const jitter = Math.floor(Math.random() * 1000) - 500;
-    const interval = Math.max(3000, CONFIG.POLL_INTERVAL_MS + jitter);
-
-    this.pollTimer = setInterval(async () => {
+    const pollLoop = async () => {
       await this.fetchLatestState();
-    }, interval);
+      const jitter = Math.floor(Math.random() * 400) - 200;
+      const interval = Math.max(1400, CONFIG.POLL_INTERVAL_MS + jitter);
+      this.pollTimer = setTimeout(pollLoop, interval);
+    };
+    pollLoop();
   }
 
   async fetchLatestState() {
